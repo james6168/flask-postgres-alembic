@@ -1,0 +1,10 @@
+postgres:
+  host: postgres
+  port: 5432
+  user: user
+  password: password
+  db_name: flask-postgres-alembic
+
+flask:
+  host: 0.0.0.0
+  port: 8080

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:17.5-alpine3.22
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DATABASE=
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  flask:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./app:/flask-app/app"
+    
+volumes:
+  postgres_data:
+
+  
