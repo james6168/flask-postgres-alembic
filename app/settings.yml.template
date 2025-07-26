@@ -1,10 +1,52 @@
-postgres:
-  host: postgres
-  port: 5432
-  user: user
-  password: password
-  db_name: flask-postgres-alembic
-
 flask:
   host: 0.0.0.0
   port: 8080
+  db_connection_string: postgresql://user:password@postgres:5432/flask-postgres-alembic
+  debug: true
+
+
+logging:
+  version: 1
+  disable_existing_loggers: False
+
+  formatters:
+    default:
+      format: "[%(asctime)s] %(levelname)s in %(name)s: %(message)s"
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: default
+      level: DEBUG
+      stream: ext://sys.stdout
+
+    file_app:
+      class: logging.FileHandler
+      formatter: default
+      level: DEBUG
+      filename: logs/app.log
+      encoding: utf8
+
+    file_postgres:
+      class: logging.FileHandler
+      formatter: default
+      level: INFO
+      filename: logs/postgres.log
+      encoding: utf8
+
+  root:
+    level: WARNING
+    handlers: [console]
+
+  loggers:
+    app:
+      level: DEBUG
+      handlers: [file_app, console]
+      propagate: false
+
+    postgres:
+      level: INFO
+      handlers: [file_postgres, console]
+      propagate: false
+
+

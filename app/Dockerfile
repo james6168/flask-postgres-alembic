@@ -5,9 +5,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /flask-app
 
-COPY /app /flask-app/
+COPY . /flask-app/
 
-RUN pip install --no-cache-dir --upgrade-pip -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "main.py" ]
 
