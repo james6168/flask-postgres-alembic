@@ -7,4 +7,4 @@ class User(AbstractModel):
 
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
-    password_hash = Column(String(128), nullable=False)
+    password_hash = Column(String(200), nullable=False)

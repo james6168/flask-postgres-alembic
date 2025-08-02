@@ -2,8 +2,12 @@ from yaml import safe_load
 from os import makedirs
 from logging.config import dictConfig
 from logging import getLogger
-from flask import Flask
+from flask import Flask, g, jsonify
 from utils.database import is_postgres_healthy
+from database import DatabaseConnection
+from routes.auth import auth_bp
+from pydantic import ValidationError
+
 
 
 def load_config(path: str = "settings.yml") -> dict:
@@ -14,19 +18,36 @@ def load_config(path: str = "settings.yml") -> dict:
     return config
 
 
-def create_app() -> Flask:
-    app = Flask(__name__)
-    config = load_config()
-    app.config.update(config["flask"])
-    logger = getLogger("app")
-    logger.info("Flask application initialized successfully")
-    logger.info(f"Flask settings: {app.config}")
+app = Flask(__name__)
+config = load_config()
+app.config.update(config["flask"])
+db = DatabaseConnection(app.config["db_connection_string"])
+logger = getLogger("app")
+logger.info("Flask application initialized successfully")
+logger.info(f"Flask settings: {app.config}")
+app.register_blueprint(auth_bp)
 
-    return app
+
+
+
+@app.before_request
+def create_db_session():
+    g.db_session = db.connect()
+
+
+@app.teardown_request
+def close_db_session(exception=None):
+    db.close()
+
+
+@app.errorhandler(ValidationError)
+def handle_pydantic_validation_error(e: ValidationError):
+    return jsonify({
+        "errors": e.errors(include_url=False, include_context=False)
+    }), 400
 
 
 if __name__ == "__main__":
-    app = create_app()
     if not is_postgres_healthy(
         app.config["db_connection_string"]
     ):
