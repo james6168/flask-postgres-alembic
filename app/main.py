@@ -46,6 +46,11 @@ def handle_pydantic_validation_error(e: ValidationError):
         "errors": e.errors(include_url=False, include_context=False)
     }), 400
 
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
+
+
 
 if __name__ == "__main__":
     if not is_postgres_healthy(
